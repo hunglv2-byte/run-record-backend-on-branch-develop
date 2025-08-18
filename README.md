@@ -1,3 +1,8 @@
+# Run docker
+```shell
+docker compose -f 
+```
+
 ## Run record-backend to trace request API using Open telemetry + zipkin
 
 ```shell

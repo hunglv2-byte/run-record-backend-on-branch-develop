@@ -1,0 +1,65 @@
+services:
+  postgres-record:
+    image: postgres:15.12-alpine
+    command: >
+      postgres
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c max_connections=1500
+    container_name: record-postgres15.12
+    restart: always
+    environment:
+      POSTGRES_USER: justincase
+      POSTGRES_PASSWORD: justincase
+      POSTGRES_DB: record_db
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+      TZ: "Asia/Tokyo"
+    ports:
+      - "5440:5432"
+    shm_size: 526mb
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+      - /home/dgwo/Documents/docker-record-backend.branch-develop/conf:/etc/postgresql
+      - ~/.docker/data/develop_branch/j_postgres15.12.1:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U justincase -d record_db"]
+      interval: 5s
+#  prometheus-record:
+#    image: prom/prometheus:latest
+#    container_name: prometheus-record
+#    ports:
+#      - "9093:9090"
+#    volumes:
+#      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+#  grafana-record:
+#    container_name: grafana-record
+#    image: grafana/grafana
+#    restart: always
+#    environment:
+#      - GF_SECURITY_ADMIN_USERNAME=${GRAFANA_ADMIN_USERNAME:-admin}
+#      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-justincase}
+#    ports:
+#      - "${GRAFANA_PORT:-9094}:3000"
+#    depends_on:
+#      - prometheus-record
+#      - tempo-record
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+#  tempo-record:
+#    image: grafana/tempo:latest
+#    command: [ "-config.file=/etc/tempo-config.yaml" ]
+#    container_name: tempo-record
+#    ports:
+#      - "3200:3200"
+#      - "4317:4317"   # OTLP gRPC receiver
+#      - "4318:4318"   # OTLP HTTP receiver
+#    volumes:
+#      - ./tempo/tempo-config.yaml:/etc/tempo-config.yaml
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin-record
+    ports:
+      - "9411:9411"
+    environment:
+      - JAVA_OPTS=-Xms1g -Xmx2g

@@ -1,6 +1,6 @@
 # Run docker
 ```shell
-docker compose -f 
+docker compose -f docker-compose.yml up -d --force-recreate
 ```
 
 ## Run record-backend to trace request API using Open telemetry + zipkin
@@ -21,3 +21,7 @@ java \
   -jar /home/dgwo/Documents/joinsure-record-backend/console/build/libs/console-0.0.1-SNAPSHOT.jar
 
 ```
+
+
+# References
+- https://github.com/nlinhvu/opentelemetry-order-service-2023

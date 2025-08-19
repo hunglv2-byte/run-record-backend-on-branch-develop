@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   postgres-record:
     image: postgres:15.12-alpine
@@ -15,7 +17,7 @@ services:
       TZ: "Asia/Tokyo"
     ports:
       - "5440:5432"
-    shm_size: 526mb
+    shm_size: 1g
     volumes:
       - ./postgres/init:/docker-entrypoint-initdb.d
       - ./conf:/etc/postgresql
@@ -32,34 +34,58 @@ services:
 #      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
 #    extra_hosts:
 #      - "host.docker.internal:host-gateway"
-#  grafana-record:
-#    container_name: grafana-record
-#    image: grafana/grafana
-#    restart: always
-#    environment:
-#      - GF_SECURITY_ADMIN_USERNAME=${GRAFANA_ADMIN_USERNAME:-admin}
-#      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-justincase}
-#    ports:
-#      - "${GRAFANA_PORT:-9094}:3000"
-#    depends_on:
-#      - prometheus-record
-#      - tempo-record
-#    extra_hosts:
-#      - "host.docker.internal:host-gateway"
-#  tempo-record:
-#    image: grafana/tempo:latest
-#    command: [ "-config.file=/etc/tempo-config.yaml" ]
-#    container_name: tempo-record
-#    ports:
-#      - "3200:3200"
-#      - "4317:4317"   # OTLP gRPC receiver
-#      - "4318:4318"   # OTLP HTTP receiver
-#    volumes:
-#      - ./tempo/tempo-config.yaml:/etc/tempo-config.yaml
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    restart: always
+    environment:
+      - GF_SECURITY_ADMIN_USERNAME=${GRAFANA_ADMIN_USERNAME:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-justincase}
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    depends_on:
+      - tempo
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./config/tempo.yaml:/etc/tempo.yaml
+    ports:
+      - "3200:3200"   # Tempo HTTP API / query
+      - "4319:4317"   # OTLP gRPC
+      - "4320:4318"   # OTLP HTTP
+  collector:
+    image: otel/opentelemetry-collector-contrib:0.91.0
+    container_name: otel-collector
+    command: [ "--config=/etc/otelcol/otel-collector.yml" ]
+    volumes:
+      - ./config/otel-collector.yml:/etc/otelcol/otel-collector.yml
+    restart: always
+    depends_on:
+      - tempo
+    ports:
+      - "4317:4317"   # gRPC endpoint for Java agent
+      - "4318:4318"   # HTTP endpoint for Java agent
+      - "8889:8889"   # Prometheus metrics
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   zipkin:
     image: openzipkin/zipkin:latest
     container_name: zipkin-record
+    restart: always
     ports:
       - "9411:9411"
     environment:
       - JAVA_OPTS=-Xms1g -Xmx2g
+  jaeger-all-in-one:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:latest
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    restart: always
+    ports:
+      - "16686:16686"
+      - "4321:4317"

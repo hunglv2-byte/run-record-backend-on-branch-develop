@@ -1,0 +1,39 @@
+server:
+  http_listen_port: 3200   # API/query UI
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317   # OTLP gRPC
+        http:
+          endpoint: 0.0.0.0:4318   # OTLP HTTP
+
+ingester:
+  trace_idle_period: 10s
+  max_block_bytes: 1_000_000
+  max_block_duration: 5m
+
+compactor:
+  compaction:
+    block_retention: 48h
+
+metrics_generator:
+  ring:
+    kvstore:
+      store: inmemory
+  registry:
+    external_labels:
+      source: tempo
+      cluster: docker-compose
+  storage:
+    path: /tmp/tempo/metrics
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /tmp/tempo/blocks
+    wal:
+      path: /tmp/tempo/wal

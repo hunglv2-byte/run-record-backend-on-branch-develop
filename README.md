@@ -23,7 +23,7 @@ java \
 
 ```
 
-- Rin via collector
+- Run via collector
 ```shell
 java \
   -javaagent:/home/dgwo/Documents/otel-probe-agent/build/libs/otel-probe-agent-1.0-SNAPSHOT.jar \

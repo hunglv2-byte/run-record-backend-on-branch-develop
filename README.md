@@ -48,5 +48,9 @@ java \
 `./db_tool.sh restore <backup_file_name>`
 Ex: `./db_tool.sh restore /home/dgwo/Documents/backup_data/20250910141500_backup.sql.gz`
 
+# Run migrate
+- Accept permission: `chmod +x migrate_and_codegen.sh`
+- Run: `./migrate_and_codegen.sh`
+
 # References
 - https://github.com/nlinhvu/opentelemetry-order-service-2023

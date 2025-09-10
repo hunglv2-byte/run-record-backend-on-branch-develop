@@ -25,6 +25,18 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U justincase -d record_db"]
       interval: 5s
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - ~/.docker/data/develop_branch/minio-data:/data
+    command: server /data --console-address ":9001"
 #  prometheus-record:
 #    image: prom/prometheus:latest
 #    container_name: prometheus-record
@@ -34,58 +46,58 @@ services:
 #      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
 #    extra_hosts:
 #      - "host.docker.internal:host-gateway"
-  grafana:
-    container_name: grafana
-    image: grafana/grafana
-#    restart: always
-    environment:
-      - GF_SECURITY_ADMIN_USERNAME=${GRAFANA_ADMIN_USERNAME:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-justincase}
-    ports:
-      - "${GRAFANA_PORT:-3000}:3000"
-    depends_on:
-      - tempo
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-  tempo:
-    image: grafana/tempo:latest
-    container_name: tempo
-    command: [ "-config.file=/etc/tempo.yaml" ]
-    volumes:
-      - ./config/tempo.yaml:/etc/tempo.yaml
-    ports:
-      - "3200:3200"   # Tempo HTTP API / query
-      - "4319:4317"   # OTLP gRPC
-      - "4320:4318"   # OTLP HTTP
-  collector:
-    image: otel/opentelemetry-collector-contrib:0.91.0
-    container_name: otel-collector
-    command: [ "--config=/etc/otelcol/otel-collector.yml" ]
-    volumes:
-      - ./config/otel-collector.yml:/etc/otelcol/otel-collector.yml
-#    restart: always
-    depends_on:
-      - tempo
-    ports:
-      - "4317:4317"   # gRPC endpoint for Java agent
-      - "4318:4318"   # HTTP endpoint for Java agent
-      - "8889:8889"   # Prometheus metrics
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-  zipkin:
-    image: openzipkin/zipkin:latest
-    container_name: zipkin-record
-#    restart: always
-    ports:
-      - "9411:9411"
-    environment:
-      - JAVA_OPTS=-Xms1g -Xmx2g
-  jaeger-all-in-one:
-    container_name: jaeger
-    image: jaegertracing/all-in-one:latest
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
-#    restart: always
-    ports:
-      - "16686:16686"
-      - "4321:4317"
+#  grafana:
+#    container_name: grafana
+#    image: grafana/grafana
+##    restart: always
+#    environment:
+#      - GF_SECURITY_ADMIN_USERNAME=${GRAFANA_ADMIN_USERNAME:-admin}
+#      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-justincase}
+#    ports:
+#      - "${GRAFANA_PORT:-3000}:3000"
+#    depends_on:
+#      - tempo
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+#  tempo:
+#    image: grafana/tempo:latest
+#    container_name: tempo
+#    command: [ "-config.file=/etc/tempo.yaml" ]
+#    volumes:
+#      - ./config/tempo.yaml:/etc/tempo.yaml
+#    ports:
+#      - "3200:3200"   # Tempo HTTP API / query
+#      - "4319:4317"   # OTLP gRPC
+#      - "4320:4318"   # OTLP HTTP
+#  collector:
+#    image: otel/opentelemetry-collector-contrib:0.91.0
+#    container_name: otel-collector
+#    command: [ "--config=/etc/otelcol/otel-collector.yml" ]
+#    volumes:
+#      - ./config/otel-collector.yml:/etc/otelcol/otel-collector.yml
+##    restart: always
+#    depends_on:
+#      - tempo
+#    ports:
+#      - "4317:4317"   # gRPC endpoint for Java agent
+#      - "4318:4318"   # HTTP endpoint for Java agent
+#      - "8889:8889"   # Prometheus metrics
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+#  zipkin:
+#    image: openzipkin/zipkin:latest
+#    container_name: zipkin-record
+##    restart: always
+#    ports:
+#      - "9411:9411"
+#    environment:
+#      - JAVA_OPTS=-Xms1g -Xmx2g
+#  jaeger-all-in-one:
+#    container_name: jaeger
+#    image: jaegertracing/all-in-one:latest
+#    environment:
+#      - COLLECTOR_OTLP_ENABLED=true
+##    restart: always
+#    ports:
+#      - "16686:16686"
+#      - "4321:4317"

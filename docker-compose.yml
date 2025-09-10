@@ -37,7 +37,7 @@ services:
   grafana:
     container_name: grafana
     image: grafana/grafana
-    restart: always
+#    restart: always
     environment:
       - GF_SECURITY_ADMIN_USERNAME=${GRAFANA_ADMIN_USERNAME:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-justincase}
@@ -63,7 +63,7 @@ services:
     command: [ "--config=/etc/otelcol/otel-collector.yml" ]
     volumes:
       - ./config/otel-collector.yml:/etc/otelcol/otel-collector.yml
-    restart: always
+#    restart: always
     depends_on:
       - tempo
     ports:
@@ -75,7 +75,7 @@ services:
   zipkin:
     image: openzipkin/zipkin:latest
     container_name: zipkin-record
-    restart: always
+#    restart: always
     ports:
       - "9411:9411"
     environment:
@@ -85,7 +85,7 @@ services:
     image: jaegertracing/all-in-one:latest
     environment:
       - COLLECTOR_OTLP_ENABLED=true
-    restart: always
+#    restart: always
     ports:
       - "16686:16686"
       - "4321:4317"

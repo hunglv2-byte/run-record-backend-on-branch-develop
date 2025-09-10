@@ -41,6 +41,12 @@ java \
   -jar /home/dgwo/Documents/joinsure-record-backend/console/build/libs/console-0.0.1-SNAPSHOT.jar
 ```
 
+# Backup:
+`./db_tool.sh backup`
+
+# Restore:
+`./db_tool.sh restore <backup_file_name>`
+Ex: `./db_tool.sh restore /home/dgwo/Documents/backup_data/20250910141500_backup.sql.gz`
 
 # References
 - https://github.com/nlinhvu/opentelemetry-order-service-2023

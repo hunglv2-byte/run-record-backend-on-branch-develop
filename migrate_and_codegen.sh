@@ -7,6 +7,9 @@
 
 set -e  # nếu lệnh nào fail thì dừng luôn
 
+PROJECT_DIR="/home/dgwo/Documents/joinsure-record-backend"
+cd "$PROJECT_DIR" || { echo "Project folder not found!"; exit 1; }
+
 echo ">>> Starting Flyway migrations..."
 
 ./gradlew :flyway:antisocialcheck:flywayMigrate

@@ -52,5 +52,8 @@ Ex: `./db_tool.sh restore /home/dgwo/Documents/backup_data/20250910141500_backup
 - Accept permission: `chmod +x migrate_and_codegen.sh`
 - Run: `./migrate_and_codegen.sh`
 
+- $ Run test
+` ./gradlew :core:test`
+
 # References
 - https://github.com/nlinhvu/opentelemetry-order-service-2023

@@ -1,6 +1,11 @@
 # Run docker
+- Run on branch `develop`
 ```shell
-docker compose -f docker-compose.yml up -d --force-recreate
+docker compose down && POSTGRES_RECORD_ENV=develop_branch docker compose up -d --force-recreate
+```
+- Run on branch `auto-insurance-premium-update`
+```shell
+docker compose down && POSTGRES_RECORD_ENV=auto-insurance-premium-update_branch docker compose up -d --force-recreate
 ```
 
 ## Run record-backend to trace request API using Open telemetry + zipkin

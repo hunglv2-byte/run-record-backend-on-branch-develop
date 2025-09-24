@@ -7,7 +7,7 @@ services:
       postgres
       -c config_file=/etc/postgresql/postgresql.conf
       -c max_connections=1500
-    container_name: record-postgres15.12
+    container_name: postgres-${POSTGRES_RECORD_ENV}
     restart: always
     environment:
       POSTGRES_USER: justincase
@@ -21,22 +21,22 @@ services:
     volumes:
       - ./postgres/init:/docker-entrypoint-initdb.d
       - ./conf:/etc/postgresql
-      - ~/.docker/data/develop_branch/j_postgres15.12.1:/var/lib/postgresql/data
+      - ~/.docker/data/${POSTGRES_RECORD_ENV}/j_postgres15.12.1:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U justincase -d record_db"]
       interval: 5s
-  minio:
-    image: quay.io/minio/minio
-    container_name: minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    volumes:
-      - ~/.docker/data/develop_branch/minio-data:/data
-    command: server /data --console-address ":9001"
+#  minio:
+#    image: quay.io/minio/minio
+#    container_name: minio
+#    ports:
+#      - "9000:9000"
+#      - "9001:9001"
+#    environment:
+#      MINIO_ROOT_USER: minioadmin
+#      MINIO_ROOT_PASSWORD: minioadmin
+#    volumes:
+#      - ~/.docker/data/develop_branch/minio-data:/data
+#    command: server /data --console-address ":9001"
 #  prometheus-record:
 #    image: prom/prometheus:latest
 #    container_name: prometheus-record

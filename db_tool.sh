@@ -3,10 +3,10 @@
 # ==============================
 # Config
 # ==============================
-CONTAINER_NAME="record-postgres15.12"
+CONTAINER_NAME="${CONTAINER_NAME:-record-postgres15.12}"
 DB_USER="justincase"
 DB_NAME="record_db"
-BACKUP_DIR="/home/dgwo/Documents/backup_data"
+BACKUP_DIR="/home/dgwo/Documents/backup_data/${CONTAINER_NAME}"
 
 mkdir -p "$BACKUP_DIR"
 
